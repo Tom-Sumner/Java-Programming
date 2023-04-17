@@ -1,0 +1,9 @@
+*.jar
+*.tiny
+*.gz
+.gradle/
+*.bat
+*.bin
+gradle/
+.idea/
+run/

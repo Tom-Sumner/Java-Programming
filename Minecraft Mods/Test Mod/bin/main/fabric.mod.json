@@ -1,0 +1,39 @@
+{
+	"schemaVersion": 1,
+	"id": "testingmod",
+	"version": "${version}",
+	"name": "testing mod",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Tom Sumner"
+	],
+	"contact": {
+		"homepage": "https://tom-sumner.github.io",
+		"sources": ""
+	},
+	"license": "MIT",
+	"icon": "assets/testingmod/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"tomsumner.testingmod.TestingMod"
+		],
+		"client":  [
+			"tomsumner.testingmod.TestingModClient"
+		],
+		"fabric-datagen": [
+			"tomsumner.testingmod.TestingModDataGenerator"
+		]
+	},
+	"mixins": [
+		"testingmod.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.14.19",
+		"minecraft": "~1.19",
+		"java": ">=17"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

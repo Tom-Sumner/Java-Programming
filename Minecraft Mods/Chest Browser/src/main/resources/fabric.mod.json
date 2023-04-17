@@ -1,0 +1,33 @@
+{
+	"schemaVersion": 1,
+	"id": "chestbrowser",
+	"version": "${version}",
+	"name": "Chest Browser",
+	"description": "Select chests in game, click broadcast, and boom, you can now view your chests in your web browser on any device connected to your wifi.",
+	"authors": [
+		"Tom Sumner"
+	],
+	"contact": {
+		"homepage": "https://tom-sumner.github.io"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/chestbrowser/logo.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"tomsumner.chestbrowser.ChestBrowser"
+		]
+	},
+	"mixins": [
+		"chestbrowser.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.14.19",
+		"minecraft": "~1.19",
+		"java": ">=17",
+		"fabric": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
