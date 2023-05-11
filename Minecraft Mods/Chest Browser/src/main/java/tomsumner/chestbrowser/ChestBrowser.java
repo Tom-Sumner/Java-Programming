@@ -1,20 +1,27 @@
 package tomsumner.chestbrowser;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.entity.player.PlayerEntity;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.BlockRenderManager;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.ChestBlockEntityRenderer;
+import net.minecraft.client.render.debug.DebugRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.item.Items;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Matrix4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class ChestBrowser implements ClientModInitializer {
@@ -24,23 +31,34 @@ public class ChestBrowser implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		ClientTickEvents.END_CLIENT_TICK.register(client -> {
-			Timer toolTimer = new Timer();
-			toolTimer.schedule(new TimerTask() {
-				@Override
-				public void run() {
-					// Check if the player is holding the browse tool
-					PlayerEntity player = client.player;
-					if (player != null) {
-						ItemStack heldItem = player.getStackInHand(Hand.MAIN_HAND);
-						if (heldItem.getItem().getName().getString().equals("minecraft:bamboo") && heldItem.hasCustomName() && heldItem.getName().getString().equals("browse tool")) {
-							player.sendMessage(Text.of("Chest Browse Tool Enabled"));
-							LOGGER.info("Player is holding tool");
-						}
-						LOGGER.info("Player is holding " + heldItem.toString());
+		MinecraftClient mcClient = MinecraftClient.getInstance();
+		UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+//			Exclude if block isn't BlockEntity
+
+			BlockPos blockEntityPos = hitResult.getBlockPos();
+			BlockEntity blockEntity = world.getBlockEntity(blockEntityPos);
+
+			if (!(blockEntity instanceof ChestBlockEntity)) {
+				return ActionResult.PASS;
+			}
+			if (!world.isClient) {
+				ItemStack heldItem = player.getStackInHand(hand);
+				if (heldItem.getItem().equals(Items.BAMBOO) && heldItem.hasCustomName() && heldItem.getName().getString().equals("tool")) {
+					if (selectedEntities.contains(blockEntityPos)) {
+						player.sendMessage(Text.of("deselected block at " + blockEntityPos.toString()), true);
+						selectedEntities.remove(blockEntityPos);
 					}
+					LOGGER.info("Selected block at " + blockEntityPos.toString());
+					player.sendMessage(Text.of("Selected block at " + blockEntityPos.toString()), true);
+
+					selectedEntities.add(blockEntityPos);
+
+					return ActionResult.CONSUME_PARTIAL;
 				}
-			}, 0, 2500);
+				player.sendMessage(Text.of("Use a bamboo named 'tool' to select."), true);
+				return ActionResult.PASS;
+			};
+			return ActionResult.PASS;
 		});
 	}
 }
